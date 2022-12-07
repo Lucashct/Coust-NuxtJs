@@ -38,10 +38,14 @@
   },
 
   computed: {
-    testString() { return this.$store.state.cartoesStore.testeString }
+    
   },
 
   methods: {
+    async gravarCartao() {
+      await this.$axios.post()
+    },
+
     showCreateNewCardDialog() {
       this.visibilidadeNewCardModal = true
     },
