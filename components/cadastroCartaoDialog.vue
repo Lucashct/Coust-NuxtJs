@@ -1,13 +1,21 @@
 <template>
-  <b-modal
-    title="Novo Cartão"
+  <b-modal  
     :visible="visibility"
     @hide="fechar()"
   >
+    <template #modal-header>
+      <b-row>
+        <b-col>
+          <span style="font-weight: 500; font-size: large;">Novo Cartão</span>     
+          <b-icon icon="credit-card" variant="info"/>
+        </b-col>
+      </b-row>
+
+    </template>
     <b-form-group>
       <label for="nomeCartao">Selecione o nome do cartão:</label>
       <b-form-select
-        v-model="cartaoSelecionado.nomeCartao"
+        v-model="cartaoForm.nomeCartao"
         id="nomeCartao"
         size="small"
         :options="cartoes"
@@ -18,18 +26,17 @@
     
     <b-form-group>
       <label for="limiteCartao">Limite</label>
-      <b-form-input
+      <money
         id="limiteCartao"
-        v-model="cartaoSelecionado.limite"
-        type="number"
-        min="0.00"
-      >
-
-      </b-form-input>
+        v-model="cartaoForm.limite"
+        v-bind="money"
+        class="form-control"
+        size="sm"
+      />
     </b-form-group>
 
     <template #modal-footer>
-      <b-button variant="primary" size="sm">Cadastrar</b-button>
+      <b-button variant="primary" size="sm" @click="recordNewCreditCard()">Cadastrar</b-button>
       <b-button variant="danger" size="sm" @click="fechar()">Fechar</b-button>
     </template>
   </b-modal>
@@ -37,13 +44,20 @@
 
 <script>
   import { cartoes } from '~/utils/constantes';
+  import URLS from '../utils/urls'
 
   export default {
     data() {
       return {
-        cartaoSelecionado: {
+        cartaoForm: {
           nomeCartao: null,
-          limite: 0
+          limite: 0.0
+        },
+        money: {
+          decimal: ',',
+          thousands: '.',
+          prefix: 'R$ ',
+          precision: 2,
         }
       }
     },
@@ -59,10 +73,19 @@
     },
 
     methods: {
+      async recordNewCreditCard() {
+        debugger
+        const payload = {
+          ...this.cartaoForm
+        }
+
+        await this.$axios.$post(URLS.CARTOES_GRAVAR, payload);
+      },
+
       reset() {
         this.cartaoSelecionado = {
           nomeCartao: null,
-          limite: 0
+          limite: 0.0
         }
       },
 

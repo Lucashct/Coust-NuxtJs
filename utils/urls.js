@@ -1,4 +1,8 @@
-const devUrl = 'localhost:3000/';
+const devUrl = 'http://localhost:4000/';
 const prodUrl = '';
 
-export const CARTOES_GRAVAR = devUrl + 'Cartoes/Gravar';
+const CARTOES_GRAVAR = devUrl + 'cartao/gravar';
+
+export default {
+  CARTOES_GRAVAR
+}
