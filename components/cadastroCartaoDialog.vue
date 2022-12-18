@@ -36,9 +36,26 @@
     </b-form-group>
 
     <template #modal-footer>
-      <b-button variant="primary" size="sm" @click="recordNewCreditCard()">Cadastrar</b-button>
+      <b-spinner variant="info" v-if="showLoading"></b-spinner>
+      <b-button variant="primary" size="sm" @click="recordNewCreditCard()" v-if="confirmButtonVisibility">Cadastrar</b-button>
       <b-button variant="danger" size="sm" @click="fechar()">Fechar</b-button>
     </template>
+
+    <b-alert
+      :show="dismissCountDown"
+      dismissible
+      :variant="variantAlert"
+      @dismissed="dismissCountDown=0"
+      @dismiss-count-down="countDownChanged"
+    >
+      <p>{{ alertMessage }}</p>
+      <b-progress
+        :variant="variantAlert"
+        :max="dismissSecs"
+        :value="dismissCountDown"
+        height="4px"
+      ></b-progress>
+    </b-alert>
   </b-modal>
 </template>
 
@@ -58,8 +75,16 @@
           thousands: '.',
           prefix: 'R$ ',
           precision: 2,
-        }
-      }
+        },
+
+        showLoading: false,
+        confirmButtonVisibility: true,
+
+        dismissSecs: 5,
+        dismissCountDown: 0,
+        variantAlert: '',
+        alertMessage: ''
+      };
     },
 
     props: {
@@ -74,19 +99,43 @@
 
     methods: {
       async recordNewCreditCard() {
-        debugger
+        this.showLoading = true;
+        this.confirmButtonVisibility = false;
+
         const payload = {
           ...this.cartaoForm
         }
 
-        await this.$axios.$post(URLS.CARTOES_GRAVAR, payload);
+        const response = await this.$axios.$post(URLS.CARTOES_GRAVAR, payload)
+        
+        switch (response.status) {
+          case 'Sucesso':
+            this.showLoading = false;
+            this.confirmButtonVisibility = true;
+            this.showAlert('success', 'Cartão criado com sucesso.');
+            break;
+          case 'Erro':
+            this.showLoading = false;
+            this.confirmButtonVisibility = true;
+            this.showAlert('warning', 'Erro ao criar cartão');
+          default:
+            this.showLoading = false;
+            this.confirmButtonVisibility = true;
+        }
+      },
+
+      countDownChanged(dismissCountDown) {
+        this.dismissCountDown = dismissCountDown
+      },
+      showAlert(variant, message) {
+        this.variantAlert = variant;
+        this.alertMessage = message;
+        this.dismissCountDown = this.dismissSecs
       },
 
       reset() {
-        this.cartaoSelecionado = {
-          nomeCartao: null,
-          limite: 0.0
-        }
+        this.cartaoForm.limite = 0.0;
+        this.cartaoForm.nomeCartao = null;
       },
 
       fechar() {

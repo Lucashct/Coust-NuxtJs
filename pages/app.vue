@@ -6,8 +6,29 @@
 
     <div class="cartoes-container">
       <b-card sub-title="Cartões">
-        
+        <b-row style="padding: 5px;" cols="4">
+          <!-- INFO SOBRE OS CARTÕES -->
+          <b-col>
+            <b-row style="margin-left: 20px;">
+              <span style="font-weight:600; font-size: 15px">Nome: </span> <span style="font-size: 15px;">{{ ' Teste' }}</span>
+            </b-row>
+
+            <b-row style="margin-left: 20px; margin-top: 20px;">
+              <span style="font-weight:600; font-size: 15px">Limite: </span> <span style="font-size: 15px;">{{ ' R$ 0.00' }}</span>
+            </b-row>
+
+            <b-row style="margin-left: 20px; margin-top: 20px;">
+              <span style="font-weight:600; font-size: 15px">Limite Disponível: </span> <span style="font-size: 15px;">{{ ' R$ 0.00' }}</span>
+            </b-row>
+          </b-col>
+          
+          <!-- IMAGEM DO CARTÃO -->
+          <b-col cols="6">
+
+          </b-col>
+        </b-row>
       </b-card>
+
       <div class="botoes-cartoes">
         <b-button @click="showCreateNewCardDialog" variant="success" size="sm">Adicionar</b-button>
         <b-button variant="danger" size="sm">Remover</b-button>
@@ -16,7 +37,7 @@
 
     <div style="margin-top: 90px;">
       <b-card sub-title="Contas do mês">
-
+        
       </b-card>
     </div>
     <cadastro-cartao-dialog :visibility="visibilidadeNewCardModal" @close="closeCreateNewCarDialog()"/>
@@ -25,35 +46,38 @@
 
 <script>
   import CadastroCartaoDialog from '../components/cadastroCartaoDialog.vue'
+  import URLS from '../utils/urls'
 
   export default {
-  components: {
-    CadastroCartaoDialog
-  },
-
-  data() {
-    return {
-      visibilidadeNewCardModal: false
-    }
-  },
-
-  computed: {
-    
-  },
-
-  methods: {
-    async gravarCartao() {
-      await this.$axios.post()
+    props: {
+      cartoesListados: Object
     },
 
-    showCreateNewCardDialog() {
-      this.visibilidadeNewCardModal = true
+    components: {
+      CadastroCartaoDialog
     },
-    closeCreateNewCarDialog() {
-      this.visibilidadeNewCardModal = false
+
+    data() {
+      return {
+        visibilidadeNewCardModal: false
+      }
+    },
+
+    async asyncData({$axios}) {
+      debugger
+      const cartoesListados = await $axios.$get(URLS.CARTOES_LISTAR);
+      return { cartoesListados }
+    },
+
+    methods: {
+      showCreateNewCardDialog() {
+        this.visibilidadeNewCardModal = true
+      },
+      closeCreateNewCarDialog() {
+        this.visibilidadeNewCardModal = false
+      }
     }
   }
- }
 </script>
 
 <style>
