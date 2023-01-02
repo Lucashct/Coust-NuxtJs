@@ -10,7 +10,6 @@ export default {
     name: "IndexPage",
     components: { App },
     async asyncData({$axios}) {
-      debugger
       const cartoesListados = await $axios.$get(URLS.CARTOES_LISTAR);
       return { cartoesListados }
     },
